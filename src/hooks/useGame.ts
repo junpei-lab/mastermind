@@ -28,8 +28,15 @@ export function useGame({ settings, settingsVersion }: UseGameProps) {
   const [elapsedTime, setElapsedTime] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(Date.now());
+  const guessesCountRef = useRef(0);
 
   useEffect(() => {
+    guessesCountRef.current = guesses.length;
+  }, [guesses.length]);
+
+  useEffect(() => {
+    if (gameStatus !== 'playing') return;
+
     startTimeRef.current = Date.now();
     timerRef.current = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
@@ -41,13 +48,17 @@ export function useGame({ settings, settingsVersion }: UseGameProps) {
           clearInterval(timerRef.current);
           timerRef.current = null;
         }
-        addScore({ attempts_used: guesses.length, won: false, time_seconds: elapsed });
+        addScore({
+          attempts_used: guessesCountRef.current,
+          won: false,
+          time_seconds: elapsed,
+        });
       }
     }, 1000);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [secretCode, settings.hasTimeLimit, settings.timeLimitSeconds, guesses.length]);
+  }, [secretCode, settings.hasTimeLimit, settings.timeLimitSeconds, gameStatus]);
 
   const versionRef = useRef(settingsVersion);
   useEffect(() => {

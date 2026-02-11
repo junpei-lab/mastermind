@@ -102,6 +102,7 @@ function App() {
         attempts={game.guesses.length}
         timeSeconds={game.elapsedTime}
         secretCode={game.secretCode}
+        guesses={game.guesses}
         onReset={game.resetGame}
       />
 

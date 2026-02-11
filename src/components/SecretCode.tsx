@@ -8,7 +8,7 @@ interface SecretCodeProps {
 }
 
 export default function SecretCode({ secretCode, gameStatus }: SecretCodeProps) {
-  const revealed = gameStatus !== 'playing';
+  const revealed = import.meta.env.DEV || gameStatus !== 'playing';
 
   return (
     <div className="flex items-center gap-2 justify-center">

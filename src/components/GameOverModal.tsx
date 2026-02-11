@@ -1,6 +1,7 @@
 import { Trophy, XCircle, RotateCcw } from 'lucide-react';
 import Peg from './Peg';
-import type { ColorName } from '../lib/gameLogic';
+import FeedbackPegs from './FeedbackPegs';
+import type { ColorName, Guess } from '../lib/gameLogic';
 import type { GameStatus } from '../hooks/useGame';
 
 interface GameOverModalProps {
@@ -8,6 +9,7 @@ interface GameOverModalProps {
   attempts: number;
   timeSeconds: number;
   secretCode: ColorName[];
+  guesses: Guess[];
   onReset: () => void;
 }
 
@@ -22,6 +24,7 @@ export default function GameOverModal({
   attempts,
   timeSeconds,
   secretCode,
+  guesses,
   onReset,
 }: GameOverModalProps) {
   if (gameStatus === 'playing') return null;
@@ -31,7 +34,7 @@ export default function GameOverModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 sm:p-8 max-w-sm w-full mx-4 shadow-2xl animate-scale-in">
+      <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
         <div className="flex flex-col items-center text-center gap-4">
           {won ? (
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -74,6 +77,32 @@ export default function GameOverModal({
               <div className="text-gray-500">タイム</div>
             </div>
           </div>
+
+          {guesses.length > 0 && (
+            <div className="w-full text-left border border-white/10 rounded-xl bg-black/20 p-3">
+              <div className="text-xs text-gray-400 mb-2 font-medium">試行履歴</div>
+              <div className="flex flex-col gap-2 max-h-52 overflow-y-auto pr-1">
+                {guesses.map((guess, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 rounded-lg bg-white/5 px-2 py-1.5"
+                  >
+                    <span className="w-6 text-xs font-mono text-gray-400 text-right">
+                      {i + 1}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {guess.colors.map((color, colorIndex) => (
+                        <Peg key={colorIndex} color={color} size="sm" />
+                      ))}
+                    </div>
+                    <div className="ml-auto">
+                      <FeedbackPegs feedback={guess.feedback} codeLength={secretCode.length} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <button
             onClick={onReset}
